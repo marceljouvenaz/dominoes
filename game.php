@@ -14,13 +14,14 @@ class Game
     const STACK = 11;
     const BOARD = 12;
 
-   /** Declare global variables
+   /**
+    * Declare global variables
     * would have preferred private variables with getters and setters,
     * but it didn't seem worth the hassle in this little code
    */
     private $playOn;
     public $tiles=[];
-    public $gameBoard = array();
+    public $gameBoard = "";
     public $availableTiles;
     public $activePlayer;
 
@@ -38,7 +39,9 @@ class Game
         $this->playGame();
     }
 
-    //functions called by startGame(), all private
+    /**
+     * functions called by startGame(), all private
+     */
     public function generateTiles()
     {
         // make TILES_IN_GAME tiles to play with
@@ -51,7 +54,6 @@ class Game
                 $this->tiles[] = $tile;
             }
         }
-        //print_r($this->tiles);
     }
     public function deal(){
         for ($this->activePlayer = 0; $this->activePlayer < self::MAX_PLAYER; $this->activePlayer++){
@@ -60,7 +62,6 @@ class Game
             }
         }
         $this->activePlayer = 0;
-
     }
     private function selectStartTile(){
        /**
@@ -69,10 +70,11 @@ class Game
         * could have created a global variable active tile?
         */
        $random = rand(0,27);
-       $this->gameBoard = [$this->tiles[$random]->getLow(), $this->tiles[$random]->getHigh()];
+       // $this->gameBoard = [$this->tiles[$random]->getLow(), $this->tiles[$random]->getHigh()];
+       $this->gameBoard = "[" . $this->tiles[$random]->getLow() . ":" . $this->tiles[$random]->getHigh() . "]";
        $this->tiles[$random]->setPlayer(self::BOARD);
        print("initial tile is: <br>");
-       print("[" . $this->gameBoard[0] . ":" . $this->gameBoard[1] . "]". "<br>" );
+       print($this->gameBoard . "<br>" );
     }
     private function playGame(){
         while ($this->playOn){
@@ -136,21 +138,21 @@ class Game
         foreach ($this->tiles as $tile){
             if($tile->getPlayer() == $this->activePlayer ){
 
-                if($tile->getLow() == $this->gameBoard[0]){
-                    array_unshift($this->gameBoard, $tile->getHigh(), $tile->getLow());
+                if($tile->getLow() == substr($this->gameBoard,1,1)){
+                    $this->gameBoard = "[" . $tile->getHigh() . ":" . $tile->getLow() . "] , " . $this->gameBoard;
                     $tile->setPlayer(self::BOARD);
                     // if number of remaining tiles for activePlayer == 0, activePlayer wins.
                     return false; }
-                if($tile->getHigh() == $this->gameBoard[0]){
-                    array_unshift($this->gameBoard, $tile->getLow(), $tile->getHigh());
+                if($tile->getHigh() == substr($this->gameBoard,1,1)){
+                    $this->gameBoard = "[" . $tile->getLow() . ":" . $tile->getHigh() . "] , " . $this->gameBoard;
                     $tile->setPlayer(self::BOARD);
                     return false; }
-                if($tile->getLow() == $this->gameBoard[count($this->gameBoard)-1]){
-                    array_push($this->gameBoard, $tile->getLow(), $tile->getHigh());
+                if($tile->getLow() == substr($this->gameBoard,-2,1)){
+                    $this->gameBoard = $this->gameBoard . " , [" . $tile->getLow() . ":" . $tile->getHigh() . "]";
                     $tile->setPlayer(self::BOARD);
                     return false; }
-                if($tile->getHigh() == $this->gameBoard[count($this->gameBoard)-1]){
-                    array_push($this->gameBoard, $tile->getHigh(), $tile->getLow());
+                if($tile->getLow() == substr($this->gameBoard,-2,1)){
+                    $this->gameBoard = $this->gameBoard . " , [" . $tile->getHigh() . ":" . $tile->getLow() . "]";
                     $tile->setPlayer(self::BOARD);
                     return false; }
             }
@@ -161,13 +163,7 @@ class Game
     {
         print("Current player is " . $this->activePlayer . "<br>");
         print("Line of domino tiles is: <br>");
-        for ($i = 0; $i < count($this->gameBoard); $i++){
-            if ($i % 2 == 0){
-                print("[ " . $this->gameBoard[$i] . " ,");
-            }else{
-                print($this->gameBoard[$i] .  "] , ");
-            }
-        }
+        print($this->gameBoard);
         print("<br>");
     }
 
