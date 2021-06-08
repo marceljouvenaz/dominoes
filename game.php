@@ -4,7 +4,9 @@ include 'tile.php';
 
 class Game
 {
-    // Set constants
+    /**
+     * Set constants
+    */
     const MAX_PLAYER = 2;
     const STARTING_NUMBER_OF_TILES = 7;
     const MAX_DOTS = 6;
@@ -12,14 +14,19 @@ class Game
     const STACK = 11;
     const BOARD = 12;
 
-    //Declare global variables
+   /** Declare global variables
+    * would have preferred private variables with getters and setters,
+    * but it didn't seem worth the hassle in this little code
+   */
     private $playOn;
     public $tiles=[];
     public $gameBoard = array();
     public $availableTiles;
     public $activePlayer;
 
-    //main function, public
+    /**
+     * main function, public
+     */
     public function startGame() {
         $this->activePlayer = 0;
         $this->availableTiles = self::TILES_IN_GAME;
@@ -77,7 +84,9 @@ class Game
         print("game over <br>");
     }
 
-    //functions called by private functions
+    /**
+     * functions called by private functions
+     */
     private function pickRandomTile() {
 
         /**
