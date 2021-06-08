@@ -7,6 +7,8 @@ class Game
     // Set constants
     const MAX_PLAYER = 2;
     const STARTING_NUMBER_OF_TILES = 7;
+    const MAX_DOTS = 6;
+    const TILES_IN_GAME = 28; // = MAX_DOTS*(MAX_DOTS + 1)/2
     const STACK = 11;
     const BOARD = 12;
 
@@ -20,7 +22,7 @@ class Game
     //main function, public
     public function startGame() {
         $this->activePlayer = 0;
-        $this->availableTiles = 28;
+        $this->availableTiles = self::TILES_IN_GAME;
 
         $this->playOn = true;
         $this->generateTiles();
@@ -32,11 +34,11 @@ class Game
     //functions called by startGame(), all private
     public function generateTiles()
     {
-        // make 28 tiles to play with
-        for ($h = 0; $h < 7; $h++){
+        // make TILES_IN_GAME tiles to play with
+        for ($h = 0; $h <= self::MAX_DOTS; $h++){
             for($l = 0; $l <= $h; $l++){
                 $tile = new Tile();
-                $tile->setPlayer($this::STACK);
+                $tile->setPlayer(self::STACK);
                 $tile->setHigh($h);
                 $tile->setLow($l);
                 $this->tiles[] = $tile;
@@ -45,8 +47,8 @@ class Game
         //print_r($this->tiles);
     }
     public function deal(){
-        for ($this->activePlayer = 0; $this->activePlayer < $this::MAX_PLAYER; $this->activePlayer++){
-            for ($tileInHand = 0; $tileInHand < $this::STARTING_NUMBER_OF_TILES; $tileInHand++){
+        for ($this->activePlayer = 0; $this->activePlayer < self::MAX_PLAYER; $this->activePlayer++){
+            for ($tileInHand = 0; $tileInHand < self::STARTING_NUMBER_OF_TILES; $tileInHand++){
                 $this->pickRandomTile();
             }
         }
@@ -55,12 +57,13 @@ class Game
     }
     private function selectStartTile(){
        /**
-        * $this->pickRandomTile("table");
-        * this doesn't work because there is no output to add to
+        * too close to functional programming,
+        * no output so have to create an interim variable.
+        * could have created a global variable active tile?
         */
        $random = rand(0,27);
        $this->gameBoard = [$this->tiles[$random]->getLow(), $this->tiles[$random]->getHigh()];
-       $this->tiles[$random]->setPlayer($this::BOARD);
+       $this->tiles[$random]->setPlayer(self::BOARD);
        print("initial tile is: <br>");
        print("[" . $this->gameBoard[0] . ":" . $this->gameBoard[1] . "]". "<br>" );
     }
@@ -92,7 +95,6 @@ class Game
         do {
             $randomTileNumber = rand(0,27);
         } while ($this->tiles[$randomTileNumber]->getPlayer() !== $this::STACK);
-        //print("player " . $this->activePlayer . " drew tile <br>");
         $this->tiles[$randomTileNumber]->setPlayer($this->activePlayer);
         $this->availableTiles--;
     }
@@ -115,7 +117,7 @@ class Game
          */
     }
     private function nextPlayer() {
-        $this->activePlayer =  ($this->activePlayer + 1) % $this::MAX_PLAYER;
+        $this->activePlayer =  ($this->activePlayer + 1) % self::MAX_PLAYER;
     }
     private function cannotPlay(): bool {
         /**
@@ -127,25 +129,20 @@ class Game
 
                 if($tile->getLow() == $this->gameBoard[0]){
                     array_unshift($this->gameBoard, $tile->getHigh(), $tile->getLow());
-                    $tile->setPlayer($this::BOARD);
+                    $tile->setPlayer(self::BOARD);
                     // if number of remaining tiles for activePlayer == 0, activePlayer wins.
                     return false; }
                 if($tile->getHigh() == $this->gameBoard[0]){
                     array_unshift($this->gameBoard, $tile->getLow(), $tile->getHigh());
-                    $tile->setPlayer($this::BOARD);
+                    $tile->setPlayer(self::BOARD);
                     return false; }
                 if($tile->getLow() == $this->gameBoard[count($this->gameBoard)-1]){
-                    /**
-                     * probably faster to do:
-                     * $this->gameBoard = $tile->getLow();
-                     * $this->gameBoard = $tile->getHigh();
-                     */
                     array_push($this->gameBoard, $tile->getLow(), $tile->getHigh());
-                    $tile->setPlayer($this::BOARD);
+                    $tile->setPlayer(self::BOARD);
                     return false; }
                 if($tile->getHigh() == $this->gameBoard[count($this->gameBoard)-1]){
                     array_push($this->gameBoard, $tile->getHigh(), $tile->getLow());
-                    $tile->setPlayer($this::BOARD);
+                    $tile->setPlayer(self::BOARD);
                     return false; }
             }
         }
